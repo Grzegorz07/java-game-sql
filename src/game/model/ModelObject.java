@@ -65,5 +65,17 @@ public class ModelObject {
         y = Player.PLAYER_DEFAULT_Y;
     }
     
+    public void setAttackerPosition(int x, int y) {
+        
+        this.x = x;
+        this.y = y;
+    }
+    
+    public void setShootPosition(int x, int y) {
+        
+        this.x = x;
+        this.y = y;
+    }
+    
     
 }

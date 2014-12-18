@@ -8,6 +8,9 @@ package game;
 import database.Database;
 import game.control.Controller;
 import game.view.GameView;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
 
 /**
  *
@@ -20,14 +23,47 @@ public class Game {
      */
     public static void main(String[] args) {
         
-        Database connection = new Database();
-        connection.getData();
+        //Database conn = new Database();
+        //conn.setTable("users");
         
-        /*
+        
+        //pridavanie do tabulky
+        /*HashMap<String, String> data;
+        data = new HashMap<String, String>();
+        
+        data.put("user", "andrej");
+        data.put("password", "1234");
+        
+        ResultSet result = conn.insert(data);
+        
+        System.out.println("QUERY DONE");*/
+        
+        /*HashMap<String, String> data;
+        data = new HashMap<String, String>();
+        
+        data.put("user", "andrej");
+        data.put("password", "1234");
+        
+        ResultSet rs = conn.search(data);
+        
+        try {
+        while(rs.next()) {
+                
+                String name = rs.getString("user");
+                String password = rs.getString("password");
+                System.out.println("MENO: " + name);
+                System.out.println("PASSWORD:" + password);
+            }
+        }
+        catch(SQLException e) {
+            System.out.println("Query SEARCH where exception thrown: " + e);
+            
+        }*/
+
         Controller controller = new Controller();
         GameView view = new GameView(controller);
         view.setVisible(true);
-                */
+              
     }
     
 }

@@ -10,6 +10,7 @@ import game.model.ModelObject;
 import game.control.Controller;
 import game.model.Player;
 import java.awt.Dimension;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
@@ -33,6 +34,7 @@ public class GameView extends javax.swing.JFrame {
         this.controller = controller;
         controller.setView(this);
         this.requestFocus();
+        logoutButton.setVisible(false);
         //this.setResizable(false);
     }
     
@@ -41,33 +43,121 @@ public class GameView extends javax.swing.JFrame {
         mainPanel.updateModel(model);
     }
     
+    
+    
     public void finishGameMessage() {
         
         JOptionPane.showMessageDialog(null, "Prehrali ste.");
         
     }
     
+    
+    
     public void startGameMessage() {
         
         JOptionPane.showMessageDialog(null, "Vitajte v hre.");
     }
     
+    
+    
     public void cannotConnectMessage() {
         JOptionPane.showMessageDialog(null, "Neda sa pripojiť k serveru.");
     }
+    
+    
+    
+    public void notLoggedInMessage() {
+        
+        JOptionPane.showMessageDialog(null, "Nieste prihlásený. Prihláste sa alebo registrujte.");
+        
+    }
+    
+    
+    
+    public void  loginFailedMessage() {
+   
+        JOptionPane.showMessageDialog(null, "Nepodarilo sa prihlasiť");
+        
+    }
+    
+    
+    public void loginSuccessfulMessage() {
+     
+        JOptionPane.showMessageDialog(null, "Boli ste prihlaseny.");
+        
+    }
+    
+    
+    
+    public HashMap showLoginDialog() {
+        
+        HashMap<String, String> mp = new HashMap<String, String>();
+        
+        String s = (String)JOptionPane.showInputDialog(
+                    null,
+                    "Zadajte vas login:",
+                    JOptionPane.PLAIN_MESSAGE
+                    );
+        mp.put("user", s);
+        
+        s = (String)JOptionPane.showInputDialog(
+                    null,
+                    "Zadajte vase heslo:",
+                    JOptionPane.PLAIN_MESSAGE
+                    );
+        mp.put("password", s);
+       
+        System.out.println("Login: " + mp.get("user") + " password: " + mp.get("password"));
+        
+        return mp;
+        
+    }
+    
+    
+    public void showMessage(String str) {
+        
+        JOptionPane.showMessageDialog(null, str);
+        
+    }
+    
+    
+    
+    public void handleButtonsAfterLogin() {
+        
+        registerButton.setVisible(false);
+        loginButton.setVisible(false);
+        logoutButton.setVisible(true);
+        
+    }
+    
+    
+    
+    public void setUsernameLabel(String str) {
+        
+        usernameLabel.setText(str);
+        
+    }
+    
+    
+    
     
     public int getDirectionX() {
         return directionX;
     }
 
+    
+    
     public int getDirectionY() {
         return directionY;
     }
+    
+    
     
     public void debugText(String string) {
         String text = textArea.getText();
         textArea.setText(text + "\n" + string);
     }
+    
     
     
     public void printTestData() {
@@ -137,10 +227,13 @@ public class GameView extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         textArea = new javax.swing.JTextArea();
         mainPanel = new game.view.MainPanel();
+        usernameLabel = new javax.swing.JLabel();
+        loginButton = new javax.swing.JButton();
+        registerButton = new javax.swing.JButton();
+        logoutButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(666, 450));
-        setPreferredSize(new java.awt.Dimension(666, 450));
         setResizable(false);
         addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
@@ -173,7 +266,6 @@ public class GameView extends javax.swing.JFrame {
         jScrollPane1.setViewportView(textArea);
 
         mainPanel.setMinimumSize(new java.awt.Dimension(500, 400));
-        mainPanel.setPreferredSize(new java.awt.Dimension(500, 400));
 
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
@@ -186,6 +278,29 @@ public class GameView extends javax.swing.JFrame {
             .addGap(0, 400, Short.MAX_VALUE)
         );
 
+        usernameLabel.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
+
+        loginButton.setText("Login");
+        loginButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loginButtonActionPerformed(evt);
+            }
+        });
+
+        registerButton.setText("Register");
+        registerButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                registerButtonActionPerformed(evt);
+            }
+        });
+
+        logoutButton.setText("Logout");
+        logoutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                logoutButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -194,13 +309,17 @@ public class GameView extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(mainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(startButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(StopButton))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(20, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(usernameLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(loginButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(logoutButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(registerButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(28, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -212,7 +331,15 @@ public class GameView extends javax.swing.JFrame {
                             .addComponent(startButton)
                             .addComponent(StopButton))
                         .addGap(18, 18, 18)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(usernameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(11, 11, 11)
+                        .addComponent(logoutButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(loginButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(registerButton))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(mainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -224,7 +351,7 @@ public class GameView extends javax.swing.JFrame {
 
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
         controller.start();
-        textArea.setText("Hra sa zacala !");
+        //textArea.setText("Hra sa zacala !");
         printTestData();
         this.requestFocus();
     }//GEN-LAST:event_startButtonActionPerformed
@@ -291,6 +418,25 @@ public class GameView extends javax.swing.JFrame {
         this.requestFocus();
     }//GEN-LAST:event_StopButtonActionPerformed
 
+    private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
+        
+        controller.loginPlayer( showLoginDialog() );
+        
+    }//GEN-LAST:event_loginButtonActionPerformed
+
+    private void registerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerButtonActionPerformed
+        
+        controller.registerPlayer( showLoginDialog() );
+        
+    }//GEN-LAST:event_registerButtonActionPerformed
+
+    private void logoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutButtonActionPerformed
+        registerButton.setVisible(true);
+        loginButton.setVisible(true);
+        logoutButton.setVisible(false);
+        controller.logoutPlayer();
+    }//GEN-LAST:event_logoutButtonActionPerformed
+
     
     
     /**
@@ -332,8 +478,12 @@ public class GameView extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton StopButton;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton loginButton;
+    private javax.swing.JButton logoutButton;
     public game.view.MainPanel mainPanel;
+    private javax.swing.JButton registerButton;
     private javax.swing.JButton startButton;
     public javax.swing.JTextArea textArea;
+    private javax.swing.JLabel usernameLabel;
     // End of variables declaration//GEN-END:variables
 }

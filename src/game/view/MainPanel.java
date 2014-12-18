@@ -5,6 +5,7 @@
  */
 package game.view;
 
+import game.model.Attacker;
 import game.model.GameMap;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -15,10 +16,12 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import game.model.ModelObject;
 import game.model.Player;
+import game.model.Shoot;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.Map;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -36,6 +39,10 @@ public class MainPanel extends javax.swing.JPanel {
     BufferedImage player_moving;
     BufferedImage player_right;
     BufferedImage player_moving_right;
+    BufferedImage attacker;
+    BufferedImage attacker_left;
+    BufferedImage attacker_right;
+    BufferedImage shoot;
     
     GameMap gameMap;
     
@@ -50,6 +57,11 @@ public class MainPanel extends javax.swing.JPanel {
     public int mapPos;
     public int mapXPosition;
     public int newXPosition;
+    
+    public int newShootX;
+    public int newShootY;
+    
+    public boolean shooting = false;
     
     
     public MainPanel() {
@@ -70,6 +82,10 @@ public class MainPanel extends javax.swing.JPanel {
             player_right = ImageIO.read(getClass().getResource("/game/view/player_right.png"));
             player_moving = ImageIO.read(getClass().getResource("/game/view/player_moving.png"));
             player_moving_right = ImageIO.read(getClass().getResource("/game/view/player_moving_right.png"));
+            attacker = ImageIO.read(getClass().getResource("/game/view/attacker.png"));
+            attacker_left = ImageIO.read(getClass().getResource("/game/view/attacker_left.png"));
+            attacker_right = ImageIO.read(getClass().getResource("/game/view/attacker_right.png"));
+            shoot = ImageIO.read(getClass().getResource("/game/view/ammo.png"));
             
             rows = ModelObject.AREA_WIDTH / 50; //texture_grass.getWidth();
             cols = ModelObject.AREA_HEIGHT / 50; //texture_grass.getHeight();
@@ -85,6 +101,145 @@ public class MainPanel extends javax.swing.JPanel {
         }
     }
     
+    
+    private void paintBackground(Graphics g) {
+        
+        //g.drawImage(background, 0, 0, backBuffer.getWidth(null),backBuffer.getHeight(null),null);
+        
+        int width = 50; //texture_grass.getWidth();
+        int height = 50; texture_grass.getHeight();
+        
+        String map = gameMap.getMap();
+        char mapSymbol;
+        
+        mapPos = mapXPosition;
+        
+        for(int i=0; i <= rows + 1 ; i++) {         
+            for(int j=0; j <= cols + 1; j++) {
+                
+                
+                //System.out.print("mapPosition: " + mapPosition);
+                
+                if(mapPos < map.length())
+                {
+                    mapSymbol = map.charAt(mapPos);
+                    mapPos = mapPos + 1;
+                    //System.out.print(mapPosition + "-" + mapSymbol);
+                }
+                else
+                {
+                    mapPos = mapPos - 100;      //ak je na konci mapy, posun dozadu vykreslenie na 100 prvkov
+                    if(mapPos < 0)
+                    {
+                        mapPos = 0;
+                    }
+                    mapSymbol = map.charAt(mapPos);
+                }
+                
+                if(gameMap.isGrass(mapSymbol) == true)
+                {
+                    g.drawImage(texture_grass, i * width, j * height, width, height, null);    
+                }
+                
+                if(gameMap.isPath(mapSymbol) == true)
+                {
+                    g.drawImage(texture_path, i * width, j * height, width, height, null);    
+                } 
+                
+            }
+            
+            //System.out.println("NEXT_ROW");
+            
+        }
+        //mapPosition = 0;
+       // System.out.println("END OF MAP");
+        
+    }
+    
+    
+    public synchronized void paintAnimatedPlayer(Graphics g, Player p) {
+        
+        if(isClicked())
+        {
+            if(p.isMoving() == true) {
+                
+                mapXPosition = (p.getX() / 45) * 10;
+                if(p.isMovingAnimation() == true)
+                {
+                    if(p.moving_left == true)
+                    {
+                        g.drawImage(player_moving, p.getX(), p.getY(), player.getWidth(), player.getHeight(), null);
+                    }
+                    else
+                    {
+                        g.drawImage(player_moving_right, p.getX(), p.getY(), player.getWidth(), player.getHeight(), null);
+                    }
+                    p.disableMovingAnimation();
+                }
+                else
+                {
+                    if(p.moving_left == true)
+                    {
+                        g.drawImage(player, p.getX(), p.getY(), player.getWidth(), player.getHeight(), null);
+                    }
+                    else
+                    {
+                        g.drawImage(player_right, p.getX(), p.getY(), player.getWidth(), player.getHeight(), null);
+                    }
+                    
+                    p.enableMovingAnimation();
+                }
+            }
+            else 
+            {
+                g.drawImage(player, p.getX(), p.getY(), player.getWidth(), player.getHeight(), null);
+            }
+        }
+        else
+        {
+            g.drawImage(player_moving, p.PLAYER_DEFAULT_X, p.PLAYER_DEFAULT_Y, player.getWidth(), player.getHeight(), null);
+        }
+    }
+    
+    
+    
+    private void paintAttacker(Graphics g, Attacker p) {
+        
+        if(p.visible == true) {
+            if (p.isMoving() == true) {
+
+                mapXPosition = (p.getX() / 45) * 10;
+
+                if (p.moving_left == true) 
+                {
+                    g.drawImage(attacker, p.getX(), p.getY(), attacker.getWidth(), attacker.getHeight(), null);
+                } 
+                else
+                {
+                    g.drawImage(attacker_right, p.getX(), p.getY(), attacker.getWidth(), attacker.getHeight(), null);
+                }
+            }
+            else
+            {
+                g.drawImage(attacker_right, p.getX(), p.getY(), attacker.getWidth(), attacker.getHeight(), null);
+            }
+        }
+          
+                   
+    }
+    
+    
+    
+    private void paintShoot(Graphics g, Shoot sh)
+    {
+        if(sh.visible == true) {
+            g.drawImage(shoot, sh.getShootPositionX(), sh.getShootPositionY(), 20, 20, null);   
+        }
+    }
+    
+    
+    
+    
     @Override
     public void paintComponent(Graphics graphic) {
         super.paintComponent(graphic);
@@ -95,7 +250,13 @@ public class MainPanel extends javax.swing.JPanel {
                 if (o instanceof Player) {
                     paintAnimatedPlayer(g, (Player) o);
                     //g.drawImage(player, o.getX(), o.getY(), player.getWidth(), player.getHeight(), null);
-                } 
+                }
+                if(o instanceof Attacker) {
+                    paintAttacker(g, (Attacker) o);
+                }
+                if(o instanceof Shoot) {
+                    paintShoot(g, (Shoot) o);
+                }
             }
         }
 
@@ -158,13 +319,22 @@ public class MainPanel extends javax.swing.JPanel {
 
     private void formMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseReleased
         
-        if(firstClick == false)
-        {
-            firstClick = true;
+        if(SwingUtilities.isRightMouseButton(evt)) {
+            shooting = true;
+            newShootX = evt.getX();
+            newShootY = evt.getY();
         }
         
-        clickedXPosition = evt.getX();
-        clickedYPosition = evt.getY();
+        if(SwingUtilities.isLeftMouseButton(evt)) {
+            if(firstClick == false)
+            {
+                firstClick = true;
+            }
+
+            clickedXPosition = evt.getX();
+            clickedYPosition = evt.getY();
+        
+        }
     }//GEN-LAST:event_formMouseReleased
     
     
